@@ -1,0 +1,98 @@
+/****************************************
+Example Sound Level Sketch for the 
+Adafruit Microphone Amplifier
+****************************************/
+
+//Modified by Jeremy S. Cook 8/25/2018 to power two RGBW strips (arranged GRBW in this case)
+//set up to be reactive to microphone input.
+
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+#include <avr/power.h>
+#endif
+
+const int sampleWindow = 50; // Sample window width in mS (50 mS = 20Hz)
+unsigned int sample;
+
+//define pins for RGBW LEDs:
+
+#define PINRGBW1  6
+#define PINRGBW2  7
+
+#define NUMPIXELSRGBW1  6
+#define NUMPIXELSRGBW2  6
+
+Adafruit_NeoPixel RGBW1 = Adafruit_NeoPixel(NUMPIXELSRGBW1, PINRGBW1, NEO_RGBW + NEO_KHZ800);
+Adafruit_NeoPixel RGBW2 = Adafruit_NeoPixel(NUMPIXELSRGBW2, PINRGBW2, NEO_RGBW + NEO_KHZ800);
+
+void setup() 
+{
+   Serial.begin(9600);
+   RGBW1.begin(); //Initializes NeoPixel library for RGBW1
+   RGBW2.begin(); //Initialize NeoPixel library for second strip
+}
+
+
+void loop() 
+{
+   unsigned long startMillis= millis();  // Start of sample window
+   unsigned int peakToPeak = 0;   // peak-to-peak level
+
+   unsigned int signalMax = 0;
+   unsigned int signalMin = 1024;
+
+   // collect data for 50 mS
+   while (millis() - startMillis < sampleWindow)
+   {
+      sample = analogRead(0);
+      if (sample < 1024)  // toss out spurious readings
+      {
+         if (sample > signalMax)
+         {
+            signalMax = sample;  // save just the max levels
+         }
+         else if (sample < signalMin)
+         {
+            signalMin = sample;  // save just the min levels
+         }
+      }
+   }
+   peakToPeak = signalMax - signalMin;  // max - min = peak-peak amplitude  
+   int displayPeak = map(peakToPeak, 0, 1023, 0, NUMPIXELSRGBW1*2);
+   //neopixel routines
+   for(int i=0;i<NUMPIXELSRGBW1;i++){
+   RGBW1.setPixelColor(i, RGBW1.Color(0,0,0,0)); //set initial color to zero
+   RGBW2.setPixelColor(i, RGBW2.Color(0,0,0,0));
+   }
+   
+   if(displayPeak > 2){ 
+    RGBW1.setPixelColor(0, RGBW1.Color(100,0,0,0)); // Moderately bright green color
+    RGBW2.setPixelColor(0, RGBW1.Color(100,0,0,0)); // Moderately bright green color
+   }
+   if(displayPeak > 3){
+    RGBW1.setPixelColor(1, RGBW1.Color(100,0,0,0)); // Moderately bright green color
+    RGBW2.setPixelColor(1, RGBW1.Color(100,0,0,0)); // Moderately bright green color  
+   }
+   if(displayPeak > 5){ 
+    RGBW1.setPixelColor(2, RGBW1.Color(75,75,0,0)); // Moderately bright yellow color
+    RGBW2.setPixelColor(2, RGBW1.Color(75,75,0,0)); // Moderately bright yellow color
+   }
+   if(displayPeak > 6){
+    RGBW1.setPixelColor(3, RGBW1.Color(50,125,0,0)); // Moderately bright orange color
+    RGBW2.setPixelColor(3, RGBW1.Color(50,125,0,0)); // Moderately bright orange color  
+   }
+   if(displayPeak > 8){
+    RGBW1.setPixelColor(4, RGBW1.Color(0,100,0,0)); // Moderately bright red color
+    RGBW2.setPixelColor(4, RGBW1.Color(0,100,0,0)); // Moderately bright red color
+   }
+   if(displayPeak > 9){ 
+    RGBW1.setPixelColor(5, RGBW1.Color(0,125,0,0)); //Slightly brighter red color
+    RGBW2.setPixelColor(5, RGBW1.Color(0,125,0,0)); //Slightly brighter red color   
+   }
+   RGBW1.show();
+   RGBW2.show();
+   Serial.print(peakToPeak);
+   Serial.print(" -- ");
+   Serial.println(displayPeak);
+   delay(50);
+}
