@@ -1,0 +1,53 @@
+// NeoPixel Ring simple sketch (c) 2013 Shae Erisson
+// released under the GPLv3 license to match the rest of the AdaFruit NeoPixel library
+// Modified by Jeremy S. Cook to control two RGBW strips on pins 6 and 5. Simple preliminary test.
+
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+#include <avr/power.h>
+#endif
+
+// Which pin on the Arduino is connected to the NeoPixels?
+// On a Trinket or Gemma we suggest changing this to 1
+#define PINRGBW1           6
+#define PINRGBW2           5
+
+// How many NeoPixels are attached to the Arduino?
+#define NUMPIXELSRGBW1      6
+#define NUMPIXELSRGBW2      6
+
+// When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
+// Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
+// example for more information on possible values.
+Adafruit_NeoPixel RGBW1 = Adafruit_NeoPixel(NUMPIXELSRGBW1, PINRGBW1, NEO_RGBW + NEO_KHZ800);
+Adafruit_NeoPixel RGBW2 = Adafruit_NeoPixel(NUMPIXELSRGBW2, PINRGBW2, NEO_RGBW + NEO_KHZ800);
+
+int delayval = 500; // delay for half a second
+
+void setup() {
+
+  RGBW1.begin(); // This initializes the NeoPixel library.
+  RGBW2.begin(); // This initializes the NeoPixel library.  
+}
+
+void loop() {
+
+  // For a set of NeoPixels the first NeoPixel is 0, second is 1, all the way up to the count of pixels minus one.
+  
+    RGBW1.setPixelColor(0, RGBW1.Color(50,0,0,0)); // Moderately bright red color
+    RGBW1.setPixelColor(1, RGBW1.Color(0,50,0,0)); // Moderately bright red color
+    RGBW1.setPixelColor(2, RGBW1.Color(0,0,50,0)); // Moderately bright red color
+    RGBW1.setPixelColor(3, RGBW1.Color(0,0,0,50)); // Moderately bright red color
+    RGBW1.show(); // This sends the updated pixel color to the hardware.
+
+    delay(delayval);
+
+    RGBW2.setPixelColor(0, RGBW2.Color(50,0,0,0)); // Moderately bright red color
+    RGBW2.setPixelColor(1, RGBW2.Color(0,50,0,0)); // Moderately bright red color
+    RGBW2.setPixelColor(2, RGBW2.Color(0,0,50,0)); // Moderately bright red color
+    RGBW2.setPixelColor(3, RGBW2.Color(0,0,0,50)); // Moderately bright red color
+    RGBW2.show(); // This sends the updated pixel color to the hardware.
+        
+    delay(delayval); // Delay for a period of time (in milliseconds).
+
+}
